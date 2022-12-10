@@ -7,7 +7,7 @@ use yii\data\ActiveDataProvider;
 use common\models\Customer as CustomerModel;
 
 /**
- * Customer represents the model behind the search form of `common\models\Customer`.
+ * customer represents the model behind the search form of `common\models\customer`.
  */
 class Customer extends CustomerModel
 {

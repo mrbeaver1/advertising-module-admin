@@ -3,16 +3,28 @@
 namespace backend\controllers;
 
 use common\models\Customer;
+use common\models\form\CreateCustomerForm;
+use common\models\form\UpdateCustomerForm;
 use common\models\search\Customer as CustomerSearch;
+use common\services\customer\CustomerService;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * CustomerController implements the CRUD actions for Customer model.
+ * CustomerController implements the CRUD actions for customer model.
  */
 class CustomerController extends Controller
 {
+    private $service;
+    public function __construct($id, $module, $config, CustomerService $service)
+    {
+        parent::__construct($id, $module, $config);
+
+        $this->service = $service;
+    }
+
     /**
      * @inheritDoc
      */
@@ -32,7 +44,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Lists all Customer models.
+     * Lists all customer models.
      *
      * @return string
      */
@@ -48,7 +60,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Displays a single Customer model.
+     * Displays a single customer model.
      * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
@@ -61,29 +73,35 @@ class CustomerController extends Controller
     }
 
     /**
-     * Creates a new Customer model.
+     * Creates a new customer model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new Customer();
+        $form = new CreateCustomerForm();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+            if ($form->load($this->request->post())) {
+                $customer = $this->service->create(
+                    $form->url,
+                    $form->active,
+                    $form->adsIds
+                );
+
+                Yii::$app->session->setFlash('success', 'Клиент ' . $form->url . ' успешно добавлен');
+
+                return $this->redirect(['view', 'id' => $customer->id]);
             }
-        } else {
-            $model->loadDefaultValues();
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'form' => $form,
         ]);
     }
 
     /**
-     * Updates an existing Customer model.
+     * Updates an existing customer model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
      * @return string|\yii\web\Response
@@ -93,17 +111,25 @@ class CustomerController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        $form = new UpdateCustomerForm($model);
+
+        $adsIds = $this->service->getRelatedAdsIds($model);
+        $form->adsIds = $adsIds;
+
+        if ($this->request->isPost && $form->load($this->request->post())) {
+            $this->service->update($model, $form->url, $form->active, $form->adsIds);
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
+            'form' => $form,
             'model' => $model,
         ]);
     }
 
     /**
-     * Deletes an existing Customer model.
+     * Deletes an existing customer model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return \yii\web\Response
@@ -111,13 +137,17 @@ class CustomerController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        $this->service->delete($model);
+
+        Yii::$app->session->setFlash('success', 'Клиент ' . $model->url . ' успешно удален');
 
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Customer model based on its primary key value.
+     * Finds the customer model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
      * @return Customer the loaded model

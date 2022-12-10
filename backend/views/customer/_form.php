@@ -1,24 +1,39 @@
 <?php
 
+use common\models\Ads;
+use kartik\select2\Select2;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var common\models\Customer $model */
-/** @var yii\widgets\ActiveForm $form */
+/** @var common\models\form\CreateCustomerForm $form */
+/** @var yii\widgets\ActiveForm $activeform */
+/** @var yii\widgets\ActiveForm $activeform */
 ?>
 
 <div class="customer-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $activeform = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'url')->textarea(['rows' => 6]) ?>
+    <?= $activeform->field($form, 'url')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'active')->textInput() ?>
-    <?= $form->field($model, 'active')->textInput() ?>
+    <?= $activeform->field($form, 'adsIds')->widget(Select2::class, [
+        'data' => ArrayHelper::map(Ads::find()->select(['id', 'redirect_to'])->all(), 'id', 'redirect_to'),
+        'options' => [
+            'placeholder' => 'Выберите рекламные объявления',
+            'multiple' => true,
+        ],
+        'toggleAllSettings' => [
+            'selectLabel' => 'Выбрать все',
+            'unselectLabel' => 'Убрать все'
+        ]
+    ]) ?>
+
+    <?= $activeform->field($form, 'active')->checkbox(['class' => 'mt-3']) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success mt-3']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

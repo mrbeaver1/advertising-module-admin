@@ -4,35 +4,32 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\jui\DatePicker;
 
-/** @var yii\web\View $this */
-/** @var common\models\Ads $model */
-/** @var yii\widgets\ActiveForm $form */
+/** @var yii\widgets\ActiveForm $activeForm */
+/** @var common\models\form\CreateAdsForm $form */
 ?>
 
 <div class="ads-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $activeForm = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
-    <?= $form->field($model, 'image')->textarea(['rows' => 6]) ?>
+    <?= $activeForm->field($form, 'image')->fileInput() ?>
 
-    <?= $form->field($model, 'start_date')->widget(DatePicker::class, [
+    <?= $activeForm->field($form, 'dateStart')->widget(DatePicker::class, [
         'language' => 'ru',
         'dateFormat' => 'yyyy-MM-dd',
         'options' => ['class' => 'form-control'],
     ]) ?>
 
-    <?= $form->field($model, 'end_date')->widget(DatePicker::class, [
+    <?= $activeForm->field($form, 'dateEnd')->widget(DatePicker::class, [
         'language' => 'ru',
         'dateFormat' => 'yyyy-MM-dd',
         'options' => ['class' => 'form-control'],
     ]) ?>
 
-    <?= $form->field($model, 'redirect_to')->textarea(['rows' => 6]) ?>
-
-    <?= $form->field($model, 'clicks')->textInput() ?>
+    <?= $activeForm->field($form, 'redirectUrl')->textarea(['rows' => 6]) ?>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

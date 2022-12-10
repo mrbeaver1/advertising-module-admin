@@ -42,7 +42,7 @@ class CustomerAds extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'customer_id' => 'Customer ID',
+            'customer_id' => 'customer ID',
             'ads_id' => 'Ads ID',
         ];
     }
@@ -58,7 +58,7 @@ class CustomerAds extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Customer]].
+     * Gets query for [[customer]].
      *
      * @return \yii\db\ActiveQuery
      */

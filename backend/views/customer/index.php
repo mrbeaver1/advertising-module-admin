@@ -10,15 +10,15 @@ use yii\grid\GridView;
 /** @var common\models\search\Customer $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Customers';
+$this->title = 'Клиенты';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="customer-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h3><?= Html::encode($this->title) ?></h3>
 
-    <p>
-        <?= Html::a('Create Customer', ['create'], ['class' => 'btn btn-success']) ?>
+    <p class="text-end">
+        <?= Html::a('Добавить клиента', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -31,15 +31,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'url:ntext',
-            'active',
+            'active:boolean',
             [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Customer $model, $key, $index, $column) {
+                'class' => ActionColumn::class,
+                'urlCreator' => function ($action, Customer $model) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }
             ],
         ],
     ]); ?>
-
-
 </div>

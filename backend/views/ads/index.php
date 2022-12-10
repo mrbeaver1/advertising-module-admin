@@ -10,15 +10,15 @@ use yii\grid\GridView;
 /** @var common\models\search\Ads $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Ads';
+$this->title = 'Рекламные объявления';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="ads-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h3><?= Html::encode($this->title) ?></h3>
 
-    <p>
-        <?= Html::a('Create Ads', ['create'], ['class' => 'btn btn-success']) ?>
+    <p class="text-end">
+        <?= Html::a('Добавить рекламное объявление', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -31,13 +31,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'image:ntext',
-            'start_date',
-            'end_date',
+//            [
+//                'attribute' => 'image',
+//                'format' => 'raw',
+//                'value' => function($model) {
+//                    return Html::img($model->image, ['class' => 'img-thumbnail', 'style' => 'width: 100px; height: 100px; object-fit: cover; object-position: 100% 0;']);
+//                }
+//            ],
+            'start_date:date',
+            'end_date:date',
             'redirect_to:ntext',
-            //'clicks',
+            'clicks',
             [
                 'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Ads $model, $key, $index, $column) {
+                'urlCreator' => function ($action, Ads $model) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }
             ],

@@ -2,17 +2,32 @@
 
 namespace backend\controllers;
 
+use common\components\ImageHelper;
 use common\models\Ads;
+use common\models\form\CreateAdsForm;
+use common\models\form\UpdateAdsForm;
 use common\models\search\Ads as AdsSearch;
+use common\services\ads\AdsService;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * AdsController implements the CRUD actions for Ads model.
  */
 class AdsController extends Controller
 {
+    private $service;
+
+    public function __construct($id, $module, $config, AdsService $service)
+    {
+        parent::__construct($id, $module, $config);
+
+        $this->service = $service;
+    }
+
     /**
      * @inheritDoc
      */
@@ -67,18 +82,21 @@ class AdsController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Ads();
+        $form = new CreateAdsForm();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+            if ($form->load($this->request->post())) {
+                $form->image = UploadedFile::getInstance($form, 'image');
+
+                $image = ImageHelper::upload($form->image);
+                $ads = $this->service->create($image, $form->dateStart, $form->dateEnd, $form->redirectUrl);
+
+                return $this->redirect(['view', 'id' => $ads->id]);
             }
-        } else {
-            $model->loadDefaultValues();
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'form' => $form,
         ]);
     }
 
@@ -93,12 +111,26 @@ class AdsController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        $form = new UpdateAdsForm($model);
+
+        if ($this->request->isPost && $form->load($this->request->post())) {
+            $image = UploadedFile::getInstance($form, 'image');
+
+            if (!is_null($image)) {
+                $imageFile = ImageHelper::upload($image);
+            } else {
+                $imageFile = $model->image;
+            }
+
+            $model = $this->service->update($model, $imageFile, $form->dateStart, $form->dateEnd, $form->redirectUrl);
+            Yii::$app->session->setFlash('success', 'Рекламное объявление (ID:  ' . $model->id . ') успешно обновлено');
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
-            'model' => $model,
+            'form' => $form,
+            'model' => $model
         ]);
     }
 
@@ -111,7 +143,10 @@ class AdsController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+
+        $this->service->delete($model);
+        Yii::$app->session->setFlash('success', 'Рекламное объявление (ID:  ' . $model->id . ') успешно удалено');
 
         return $this->redirect(['index']);
     }
