@@ -10,7 +10,7 @@ use yii\jui\DatePicker;
 
 <div class="ads-form">
 
-    <?php $activeForm = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
+    <?php $activeForm = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data', 'autocomplete' => 'off']]); ?>
 
     <?= $activeForm->field($form, 'image')->fileInput() ?>
 

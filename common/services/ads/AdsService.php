@@ -30,6 +30,8 @@ class AdsService
     {
         CustomerAds::deleteAll(['ads_id' => $ads->id]);
 
+        unlink($ads->image);
+
         $ads->delete();
     }
 

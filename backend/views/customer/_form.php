@@ -14,7 +14,11 @@ use yii\widgets\ActiveForm;
 
 <div class="customer-form">
 
-    <?php $activeform = ActiveForm::begin(); ?>
+    <?php $activeform = ActiveForm::begin([
+        'options' => [
+            'autocomplete' => 'off'
+        ]
+    ]); ?>
 
     <?= $activeform->field($form, 'url')->textarea(['rows' => 6]) ?>
 

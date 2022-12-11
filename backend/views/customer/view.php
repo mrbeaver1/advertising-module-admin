@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'url:ntext',
-            'active',
+            'active:boolean',
         ],
     ]) ?>
 

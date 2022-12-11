@@ -3,11 +3,6 @@
 return [
     'basePath' => dirname(__DIR__),
     'components' => [
-        'request' => [
-            'parsers' => [
-                'application/json' => 'yii\web\JsonParser',
-            ]
-        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,

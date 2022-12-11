@@ -2,13 +2,14 @@
 
 class ContentBuilder
 {
-    private const CACHE_DIRECTORY = __DIR__; //Директория кэша
+    private const CACHE_DIRECTORY = 'log'; //Директория кэша
     private const CACHE_FILE_NAME = 'footer.txt'; //Название файла для кэша футера
     private const LAST_UPDATE_LOG_FILE = 'uodate_log.txt'; // Название файла для логов обновления
     private const ADS_URL = 'http://advertising-module.local'; // Сайт адвентер
     private const ADS_GET_URL = '/api/get-ads'; //Не трогать
-    private const CLIENT_ID = 2; //ID клиента в системе сайта адвентера
+    private const CLIENT_ID = 1; //ID клиента в системе сайта адвентера
     private const ADS_COUNT = 5; // Количество банеров
+    private const TIMEOUT = 1; // Таймаут запросов в минутах
     private const ADS_RANGE = [
         "50X60",
         "60X70",
@@ -29,7 +30,7 @@ class ContentBuilder
         if (
             is_file($cacheFileName) &&
             is_file($lastUpdateLogFile) &&
-            (new DateTimeImmutable(file_get_contents($lastUpdateLogFile)))->diff(new DateTimeImmutable())->i <= 1) {
+            (new DateTimeImmutable(file_get_contents($lastUpdateLogFile)))->diff(new DateTimeImmutable())->i <= self::TIMEOUT) {
             return file_get_contents(self::CACHE_DIRECTORY . DIRECTORY_SEPARATOR . self::CACHE_FILE_NAME);
         } else {
             $post = json_encode([
@@ -48,12 +49,11 @@ class ContentBuilder
                 'Content-Type: application/json',
                 'Content-Length: ' . strlen($post)
             ]);
+
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
 
-            if(curl_exec($curl) === false)
-            {
-                echo 'Ошибка curl: ' . curl_error($curl);
-                die();
+            if (curl_exec($curl) === false) {
+                return '<h1>Ошибка curl: ' . curl_error($curl) . '</h1>';
             }
 
             $response = curl_exec($curl);
@@ -62,15 +62,22 @@ class ContentBuilder
 
             $html = '<div class="ads-baner-data">';
 
-            $data = json_decode($response, true)['data'];
+            $data = json_decode($response, true);
+
+            if (is_null($data)) {
+                return '<h1>Данные с сайта адвентера не получены! Проверьте передаваемые параметры или свяжитесь с нами!</h1>';
+            } else {
+                $data = $data['data'];
+            }
 
             foreach ($data as $ads) {
                 $html .= '
                 <span class="ads-baner-image">
                     <a href="' . self::ADS_URL . $ads['redirectUrl'] . '"><img src="' . $ads['base64'] . '"></a>
                 </span>
-        ';
+            ';
             }
+
             $html .= '</div>';
 
             file_put_contents($lastUpdateLogFile, (new DateTimeImmutable())->format('Y-m-d H:i:s'));
