@@ -4,6 +4,7 @@ namespace common\services\customer;
 
 use common\models\base\CustomerAds;
 use common\models\Customer;
+use yii\web\NotFoundHttpException;
 
 class CustomerService
 {
@@ -91,5 +92,16 @@ class CustomerService
     {
         CustomerAds::deleteAll(['customer_id' => $customer->id]);
         $customer->delete();
+    }
+
+    public function getById($id)
+    {
+        $customer = Customer::find()->where(['id' => $id])->one();
+
+        if (is_null($customer)) {
+            throw new NotFoundHttpException('Клиента с ID ' . $id . ' не существует в системе');
+        }
+
+        return $customer;
     }
 }

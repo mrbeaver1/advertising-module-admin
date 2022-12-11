@@ -2,6 +2,7 @@
 
 namespace common\components;
 
+use Gumlet\ImageResize;
 use Yii;
 
 class ImageHelper
@@ -17,5 +18,13 @@ class ImageHelper
         }
 
         return $uploadFilePath;
+    }
+
+    public static function resize($path, $height, $width)
+    {
+        $imageResizer = new ImageResize($path);
+            $imageResizer->resize($width, $height);
+
+        return $imageResizer->getImageAsString();
     }
 }
