@@ -12,17 +12,6 @@ class ContentBuilder
     public $timeout;// Таймаут запросов в минутах
     public $adsRange;
 
-    /**
-     * @param $cacheDirectory
-     * @param $cacheFileName
-     * @param $lastUpdateLogFile
-     * @param $adsUrl
-     * @param $adsGetUrl
-     * @param $clientId
-     * @param $adsCount
-     * @param $timeout
-     * @param $adsRange
-     */
     public function __construct()
     {
         $this->cacheDirectory = 'log/1/2';
