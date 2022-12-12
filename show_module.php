@@ -2,26 +2,50 @@
 
 class ContentBuilder
 {
-    private const CACHE_DIRECTORY = 'log'; //Директория кэша
-    private const CACHE_FILE_NAME = 'footer.txt'; //Название файла для кэша футера
-    private const LAST_UPDATE_LOG_FILE = 'update_log.txt'; // Название файла для логов обновления
-    private const ADS_URL = 'http://advertising-module.local'; // Сайт адвентер
-    private const ADS_GET_URL = '/api/get-ads'; //Не трогать
-    private const CLIENT_ID = 4; //ID клиента в системе сайта адвентера
-    private const ADS_COUNT = 5; // Количество банеров
-    private const TIMEOUT = 1; // Таймаут запросов в минутах
-    private const ADS_RANGE = [
-        "50X60",
-        "60X70",
-        "70X80",
-        "80X90",
-        "90X100"
-    ]; // Разрешения фотографий
+    public $cacheDirectory;// = 'log/1/2'; //Директория кэша
+    public $cacheFileName; //= 'footer.txt'; //Название файла для кэша футера
+    public $lastUpdateLogFile;// = 'update_log.txt'; // Название файла для логов обновления
+    public $adsUrl;// = 'http://advertising-module.local'; // Сайт адвентер
+    public $adsGetUrl; //Не трогать
+    public $clientId; //ID клиента в системе сайта адвентера
+    public $adsCount;// Количество банеров
+    public $timeout;// Таймаут запросов в минутах
+    public $adsRange;
+
+    /**
+     * @param $cacheDirectory
+     * @param $cacheFileName
+     * @param $lastUpdateLogFile
+     * @param $adsUrl
+     * @param $adsGetUrl
+     * @param $clientId
+     * @param $adsCount
+     * @param $timeout
+     * @param $adsRange
+     */
+    public function __construct()
+    {
+        $this->cacheDirectory = 'log/1/2';
+        $this->cacheFileName = 'footer.txt';
+        $this->lastUpdateLogFile = 'last_update.txt';
+        $this->adsUrl = 'http://advertising-module.local';
+        $this->adsGetUrl = '/api/get-ads';
+        $this->clientId = 4;
+        $this->adsCount = 5;
+        $this->timeout = 1;
+        $this->adsRange = [
+            "50X60",
+            "60X70",
+            "70X80",
+            "80X90",
+            "90X100"
+        ];
+    }
 
     private function prepare()
     {
-        if (!is_dir(self::CACHE_DIRECTORY)) {
-            mkdir(self::CACHE_DIRECTORY);
+        if (!is_dir($this->cacheDirectory)) {
+            mkdir($this->cacheDirectory);
         }
     }
 
@@ -30,7 +54,7 @@ class ContentBuilder
         $lastUpdateDatetime = new DateTimeImmutable(file_get_contents($lastUpdateLogFile));
         $difInMinutes = $lastUpdateDatetime->diff(new DateTimeImmutable())->i;
 
-        return $difInMinutes <= self::TIMEOUT;
+        return $difInMinutes <= $this->timeout;
     }
 
     private function isUseCache($cacheFileName, $lastUpdateLogFile)
@@ -45,12 +69,12 @@ class ContentBuilder
     private function getAdsData()
     {
         $post = json_encode([
-            "clientId" => self::CLIENT_ID,
-            'adsCount' => self::ADS_COUNT,
-            'adsRange' => self::ADS_RANGE,
+            "clientId" => $this->clientId,
+            'adsCount' => $this->adsCount,
+            'adsRange' => $this->adsRange,
         ]);
 
-        $url = self::ADS_URL . self::ADS_GET_URL;
+        $url = $this->adsUrl . $this->adsGetUrl;
 
         $curl = curl_init($url);
 
@@ -89,7 +113,7 @@ class ContentBuilder
         foreach ($data as $ads) {
             $html .= '
                 <span class="ads-baner-image">
-                    <a href="' . self::ADS_URL . $ads['redirectUrl'] . '"><img src="' . $ads['base64'] . '"></a>
+                    <a href="' . $this->adsUrl . $ads['redirectUrl'] . '"><img src="' . $ads['base64'] . '"></a>
                 </span>
             ';
         }
@@ -106,8 +130,8 @@ class ContentBuilder
     {
         $this->prepare();
 
-        $cacheFileName = self::CACHE_DIRECTORY . DIRECTORY_SEPARATOR . self::CACHE_FILE_NAME;
-        $lastUpdateLogFile = self::CACHE_DIRECTORY . DIRECTORY_SEPARATOR . self::LAST_UPDATE_LOG_FILE;
+        $cacheFileName = $this->cacheDirectory . DIRECTORY_SEPARATOR . $this->cacheFileName;
+        $lastUpdateLogFile = $this->cacheDirectory . DIRECTORY_SEPARATOR . $this->lastUpdateLogFile;
 
         if ($this->isUseCache($cacheFileName, $lastUpdateLogFile)) {
             return file_get_contents($cacheFileName);
