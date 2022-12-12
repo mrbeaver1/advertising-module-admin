@@ -68,7 +68,15 @@ class ApiController extends \yii\rest\Controller
 
         $adsIds = $this->customerService->getRelatedAdsIds($customer);
 
-        $availableIds = count($adsIds) <= $adsData->adsCount ? $adsIds : array_rand($adsIds, $adsData->adsCount);
+        if (count($adsIds) <= $adsData->adsCount) {
+            $availableIds = $adsIds;
+        } else {
+            $rand = array_rand($adsIds, $adsData->adsCount);
+
+            foreach ($rand as $randKey) {
+                $availableIds[] = $adsIds[$randKey];
+            }
+        }
 
         $adsResponseData = $this->adsService->getDataForResponse($availableIds, $adsData->adsRange);
 
